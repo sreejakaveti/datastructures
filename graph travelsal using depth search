@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+struct Graph {
+    int numVertices;
+    struct Node** adjacencyList;
+};
+
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+struct Graph* createGraph(int numVertices) {
+    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
+    graph->numVertices = numVertices;
+    graph->adjacencyList = (struct Node**)malloc(numVertices * sizeof(struct Node*));
+    for (int i = 0; i < numVertices; ++i) {
+        graph->adjacencyList[i] = NULL;
+    }
+    return graph;
+}
+
+void addEdge(struct Graph* graph, int src, int dest) {
+    struct Node* newNode = createNode(dest);
+    newNode->next = graph->adjacencyList[src];
+    graph->adjacencyList[src] = newNode;
+}
+
+void DFS(struct Graph* graph, int vertex, int visited[]) {
+    visited[vertex] = 1;
+    printf("%d ", vertex);
+
+    struct Node* temp = graph->adjacencyList[vertex];
+    while (temp != NULL) {
+        int adjVertex = temp->data;
+        if (!visited[adjVertex]) {
+            DFS(graph, adjVertex, visited);
+        }
+        temp = temp->next;
+    }
+}
+
+int main() {
+    int numVertices, numEdges;
+    printf("Enter the number of vertices and edges: ");
+    scanf("%d %d", &numVertices, &numEdges);
+
+    struct Graph* graph = createGraph(numVertices);
+
+    printf("Enter the edges (src dest):\n");
+    for (int i = 0; i < numEdges; ++i) {
+        int src, dest;
+        scanf("%d %d", &src, &dest);
+        addEdge(graph, src, dest);
+    }
+
+    int* visited = (int*)malloc(numVertices * sizeof(int));
+    for (int i = 0; i < numVertices; ++i) {
+        visited[i] = 0;
+    }
+
+    printf("DFS traversal starting from vertex 0:\n");
+    DFS(graph, 0, visited);
+
+    free(visited);
+    return 0;
+}
